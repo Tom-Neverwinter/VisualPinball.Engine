@@ -152,6 +152,11 @@ namespace VisualPinball.Unity
 			_map.Clear();
 		}
 
+		public override void ClearFrame(ClearDisplayData data)
+		{
+			Clear();
+		}
+
 		public override void Clear()
 		{
 			UpdateFrame(DisplayFrameFormat.Dmd2, new byte[_width * _height]);

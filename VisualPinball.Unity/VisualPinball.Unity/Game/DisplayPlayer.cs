@@ -32,7 +32,8 @@ namespace VisualPinball.Unity
 		{
 			_gamelogicEngine = gamelogicEngine;
 			_gamelogicEngine.OnDisplaysRequested += HandleDisplayRequested;
-			_gamelogicEngine.OnDisplayFrame += HandleFrameEvent;
+			_gamelogicEngine.OnUpdateFrame += HandleUpdateFrame;
+			_gamelogicEngine.OnClearFrame += HandleClearFrame;
 
 			var dmds = Object.FindObjectsOfType<DisplayComponent>();
 			foreach (var dmd in dmds) {
@@ -55,17 +56,25 @@ namespace VisualPinball.Unity
 			}
 		}
 
-		private void HandleFrameEvent(object sender, DisplayFrameData e)
+		private void HandleUpdateFrame(object sender, DisplayFrameData e)
 		{
 			if (_displayGameObjects.ContainsKey(e.Id)) {
 				_displayGameObjects[e.Id].UpdateFrame(e.Format, e.Data);
 			}
 		}
 
+		private void HandleClearFrame(object sender, ClearDisplayData e)
+		{
+			if (_displayGameObjects.ContainsKey(e.Id)) {
+				_displayGameObjects[e.Id].ClearFrame(e);
+			}
+		}
+
 		public void OnDestroy()
 		{
 			_gamelogicEngine.OnDisplaysRequested -= HandleDisplayRequested;
-			_gamelogicEngine.OnDisplayFrame -= HandleFrameEvent;
+			_gamelogicEngine.OnUpdateFrame -= HandleUpdateFrame;
+			_gamelogicEngine.OnClearFrame -= HandleClearFrame;
 		}
 	}
 }

@@ -49,7 +49,8 @@ namespace VisualPinball.Unity
 		public event EventHandler<LampsEventArgs> OnLampsChanged;
 		public event EventHandler<SwitchEventArgs2> OnSwitchChanged;
 		public event EventHandler<RequestedDisplays> OnDisplaysRequested;
-		public event EventHandler<DisplayFrameData> OnDisplayFrame;
+		public event EventHandler<DisplayFrameData> OnUpdateFrame;
+		public event EventHandler<ClearDisplayData> OnClearFrame;
 		public event EventHandler<EventArgs> OnStarted;
 
 		private const int DmdWidth = 128;
@@ -211,7 +212,7 @@ namespace VisualPinball.Unity
 				var data = frameTex.GetRawTextureData<byte>().ToArray();
 
 				// this texture happens to be stored as RGB24, so we can send the raw data directly.
-				OnDisplayFrame?.Invoke(this, new DisplayFrameData(DisplayDmd, DisplayFrameFormat.Dmd24, data));
+				OnUpdateFrame?.Invoke(this, new DisplayFrameData(DisplayDmd, DisplayFrameFormat.Dmd24, data));
 
 				_frameSent = true;
 			}

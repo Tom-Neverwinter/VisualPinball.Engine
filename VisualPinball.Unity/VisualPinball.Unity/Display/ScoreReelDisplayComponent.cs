@@ -17,6 +17,7 @@
 // ReSharper disable InconsistentNaming
 
 using System;
+using System.Collections;
 using UnityEngine;
 
 namespace VisualPinball.Unity
@@ -39,6 +40,9 @@ namespace VisualPinball.Unity
 
 		[SerializeField] public string _id = "display0";
 
+		private int score = 0;
+
+
 		private void Start()
 		{
 			foreach (var reelObject in ReelObjects) {
@@ -49,7 +53,8 @@ namespace VisualPinball.Unity
 
 		public override void UpdateFrame(DisplayFrameFormat format, byte[] data)
 		{
-			var score = (int)BitConverter.ToSingle(data);
+			score = (int)BitConverter.ToSingle(data);
+
 			var digits = DigitArr(score);
 			var j = digits.Length - 1;
 			for (var i = ReelObjects.Length - 1; i >= 0; i--) {
@@ -63,11 +68,35 @@ namespace VisualPinball.Unity
 			}
 		}
 
+		public override void ClearFrame(ClearDisplayData data)
+		{
+		   StartCoroutine(Reset(data));
+		}
+
 		public override void Clear()
 		{
-			foreach (var reelObject in ReelObjects) {
-				reelObject.AnimateTo(0);
+		}
+
+		private IEnumerator Reset(ClearDisplayData data)
+		{
+			data.OnStarted?.Invoke(this, EventArgs.Empty);
+
+			while (score > 0)
+			{
+				Debug.Log("Waiting...");
+
+				yield return new WaitForSeconds((float)(.750 / 6));
+
+				float newScore = (float)Advance(score);
+
+				Debug.Log($"Updating to {newScore}");
+
+				UpdateFrame(DisplayFrameFormat.Numeric, BitConverter.GetBytes(newScore));
+
+				data.OnPulse?.Invoke(this, EventArgs.Empty);
 			}
+
+			data.OnStopped?.Invoke(this, EventArgs.Empty);
 		}
 
 		private static void SetReel(ScoreReelComponent sr, int num)
@@ -101,6 +130,17 @@ namespace VisualPinball.Unity
 				n /= 10;
 			}
 			return result;
+		}
+
+		private static int Advance(int score)
+		{
+			var value = 0;
+
+			foreach (var i in DigitArr(score)) {
+				value = (value * 10) + ((i > 0 && i < 9) ? (i + 1) : 0);
+			}
+
+			return value;
 		}
 
 		#region Unused

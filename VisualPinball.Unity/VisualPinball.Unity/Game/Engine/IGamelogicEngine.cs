@@ -42,7 +42,8 @@ namespace VisualPinball.Unity
 		/// most GLEs only know about their displays when they start the game.
 		/// </remarks>
 		event EventHandler<RequestedDisplays> OnDisplaysRequested;
-		event EventHandler<DisplayFrameData> OnDisplayFrame;
+		event EventHandler<DisplayFrameData> OnUpdateFrame;
+		event EventHandler<ClearDisplayData> OnClearFrame;
 
 		#endregion
 
@@ -198,11 +199,34 @@ namespace VisualPinball.Unity
 		public readonly DisplayFrameFormat Format;
 		public readonly float Brightness = 1;
 
+		public DisplayFrameData(string id)
+		{
+			Id = id;
+		}
+
 		public DisplayFrameData(string id, DisplayFrameFormat format, byte[] data)
 		{
 			Id = id;
 			Format = format;
 			Data = data;
+		}
+	}
+
+	public class ClearDisplayData
+	{
+		public readonly string Id;
+
+		public EventHandler<EventArgs> OnStarted;
+		public EventHandler<EventArgs> OnStopped;
+		public EventHandler<EventArgs> OnPulse;
+
+		public ClearDisplayData(string id, EventHandler<EventArgs> onStarted, EventHandler<EventArgs> onStopped, EventHandler<EventArgs> onPulse)
+		{
+			Id = id;
+
+			OnStarted = onStarted;
+			OnStopped = onStopped;
+			OnPulse = onPulse;
 		}
 	}
 

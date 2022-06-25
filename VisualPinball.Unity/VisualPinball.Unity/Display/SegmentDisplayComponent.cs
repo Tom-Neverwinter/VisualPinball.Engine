@@ -275,6 +275,11 @@ namespace VisualPinball.Unity
 			UpdateFrame(target);
 		}
 
+		public override void ClearFrame(ClearDisplayData data)
+		{
+			Clear();
+		}
+
 		public override void UpdateDimensions(int width, int height, bool _ = false)
 		{
 			_texture = new Texture2D(MaxNumSegments, width * height);
